@@ -10,6 +10,8 @@ from django.contrib.auth.models import (
     PermissionsMixin,
 )
 
+from datetime import date
+
 class UserManager(BaseUserManager):
     """Maganer for uses."""
 
@@ -43,3 +45,16 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = "email"
+
+
+class Positive_Things(models.Model):
+    """Positive things in the system."""
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
+    title = models.CharField(max_length=255, blank=False)
+    date = models.DateField(auto_now_add=True, default= date.today())
+
+    def __str__(self):
+        return self.title
