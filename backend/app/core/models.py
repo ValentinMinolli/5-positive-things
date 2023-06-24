@@ -4,13 +4,13 @@ Database models.
 
 from django.conf import settings
 from django.db import models
+from django.utils.timezone import now
 from django.contrib.auth.models import (
     AbstractBaseUser,
     BaseUserManager,
     PermissionsMixin,
 )
 
-from datetime import date
 
 class UserManager(BaseUserManager):
     """Maganer for uses."""
@@ -47,14 +47,15 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = "email"
 
 
-class Positive_Things(models.Model):
+class PositiveThings(models.Model):
     """Positive things in the system."""
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
     )
     title = models.CharField(max_length=255, blank=False)
-    date = models.DateField(auto_now_add=True, default= date.today())
+    date = models.DateField(auto_now_add=True)
+    description = models.TextField(blank=False)
 
     def __str__(self):
         return self.title

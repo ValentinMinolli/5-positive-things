@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 
 from core import models
 
-def create_user(email="test-email@example.com", password="password123"):
+def create_user(email="testemail@example.com", password="password123"):
     """Create and return a new user."""
     return get_user_model().objects.create_user(email, password)
 
@@ -27,15 +27,15 @@ class ModelTests(TestCase):
     def test_new_user_email_normalize(self):
         """Test email is normalize for new users."""
         sample_mails =[
-            ["test123@EXAMPLE.com", "test123@example.com"],
-            ["Test123@Example.com", "test123@example.com"],
-            ["TEST123@EXAMPLE.COM", "test123@example.com"],
-            ["test123@example.COM", "test123@example.com"],
-            ["TeSt123@ExAmPlE.CoM", "test123@example.com"],
+            ["test1@EXAMPLE.com", "test1@example.com"],
+            ["Test2@Example.com", "Test2@example.com"],
+            ["TEST3@EXAMPLE.COM", "TEST3@example.com"],
+            ["test4@example.COM", "test4@example.com"],
+            ["TeSt5@ExAmPlE.CoM", "TeSt5@example.com"],
         ]
 
         for email, expected in sample_mails:
-            user = get_user_model().objects.create_user(email, "test-password123")
+            user = get_user_model().objects.create_user(email, "testpassword123")
             self.assertEqual(user.email, expected)
 
     def test_new_user_without_email_raises_error(self):
@@ -51,5 +51,34 @@ class ModelTests(TestCase):
         )
 
         self.assertTrue(superuser.is_superuser)
+
+    def test_create_five_positive_things(self):
+        """Test creating five positive things is successfull."""
+        user = get_user_model().objects.create_user(
+            "testemail@example.com",
+            "password123",
+        )
+
+        titles = ["Title 1", "Title 2", "Title 3", "Title 4", "Title 5"]
+        descriptions = [
+            "Description 1", 
+            "Description 2", 
+            "Description 3", 
+            "Description 4", 
+            "Description 5",
+            ]
+
+        positive_things = []
+        for i in range(0, 4):
+            positive_thing = models.PositiveThings.objects.create(
+                user=user,
+                title=titles[i],
+                description=descriptions[i]
+            )
+            positive_things.append(positive_thing)
+
+        
+        self.assertEqual(len(positive_things), 5)
+        self.assertEqual(positive_things[user], self.user)
 
         
