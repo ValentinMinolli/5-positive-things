@@ -23,7 +23,7 @@ from core.models import PositiveThings
 from positiveThing import serializers
 
 
-class PositiveThingsViews(viewsets.ModelViewSet):
+class PositiveThingsViewSet(viewsets.ModelViewSet):
     """View for the manage positive things API."""
     serializer_class = serializers.PositiveThings
     queryset = PositiveThings.objects.all()
@@ -40,4 +40,38 @@ class PositiveThingsViews(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         """Create a new positive thing."""
         serializer.save(user=self.request.user)
+
+@extend_schema_view(
+    list=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                'assigned_only',
+                OpenApiTypes.INT, enum=[0, 1],
+                description='Filter by dates assigned to positive things.',
+            )
+        ]
+    )
+)
+
+class BasePositiveThingsAttrViewSet(
+    mixins.DestroyModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet
+):
+    """Base viewset for positive things attributes."""
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """Filter queryset to authenticated user."""
+        assigned_only = bool(
+            int(self.request.query_params.get('assigned_only'))
+        )
+        queryset = self.queryset
+        if assigned_only:
+            queryset = queryset.filter(positive_things__isnull = False)
         
+        return queryset.filter(
+            user=self.request.user
+        ).order_by('-title').distinct()

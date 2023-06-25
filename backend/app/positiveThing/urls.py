@@ -12,3 +12,9 @@ from positiveThing import views
 
 router = DefaultRouter()
 router.register('positive things', views.PositiveThingsViewSet)
+
+app_name = 'positive-things'
+
+urlpatterns = [
+    path('', include(router.urls))
+]
